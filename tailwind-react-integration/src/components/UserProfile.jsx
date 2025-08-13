@@ -2,7 +2,7 @@ function UserProfile() {
   return (
     <div className="bg-gray-100 p-8 max-w-sm mx-auto my-20 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <img
-        src="https://via.placeholder.com/150"
+        src="https://i.pravatar.cc/150?img=3"
         alt="User"
         className="rounded-full w-36 h-36 mx-auto transform hover:scale-110 transition-transform duration-300 ease-in-out"
       />
