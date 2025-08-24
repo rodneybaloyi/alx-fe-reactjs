@@ -1,5 +1,5 @@
-import React from "react";
-import FormikForm from "./components/formikForm"; // lowercase file name
+// src/App.jsx
+import FormikForm from "./components/formikForm";
 
 function App() {
   return (
