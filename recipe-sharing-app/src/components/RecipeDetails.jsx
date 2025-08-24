@@ -1,402 +1,48 @@
-import { useRecipeStore } from '../recipeStore';
-import EditRecipeForm from './EditRecipeForm';
-import DeleteRecipeButton from './DeleteRecipeButton';
-import FavoriteButton from './FavoriteButton';
-import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import React from "react";
+import useRecipeStore from "../recipeStore";
+import FavoriteButton from "./FavoriteButton";
 
-const RecipeDetails = () => {
-  const { id } = useParams();
-  const recipe = useRecipeStore((state) =>
-    state.recipes.find((r) => r.id === parseInt(id))
-  );
-  const [isEditing, setIsEditing] = useState(false);
+const RecipeDetails = ({ recipeId }) => {
+  const { recipes } = useRecipeStore();
+  const recipe = recipes.find((r) => r.id === recipeId);
 
   if (!recipe) {
     return (
-      <div style={{
-        textAlign: 'center',
-        padding: '40px',
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-      }}>
-        <h2 style={{ color: '#f44336', marginBottom: '20px' }}>Recipe Not Found</h2>
-        <p style={{ marginBottom: '30px', color: '#666' }}>
-          The recipe you're looking for doesn't exist or may have been deleted.
-        </p>
-        <Link 
-          to="/"
-          style={{
-            display: 'inline-block',
-            padding: '12px 24px',
-            backgroundColor: '#2196F3',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#1976D2';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#2196F3';
-          }}
-        >
-          Back to Recipes
-        </Link>
+      <div className="text-center p-6 text-gray-500">
+        <h2 className="text-xl font-semibold">Recipe Not Found</h2>
+        <p className="mt-2">Please select a recipe from the list.</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      {/* Navigation */}
-      <div style={{ marginBottom: '20px' }}>
-        <Link 
-          to="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            color: '#2196F3',
-            textDecoration: 'none',
-            fontSize: '16px',
-            fontWeight: 'bold'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.textDecoration = 'underline';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.textDecoration = 'none';
-          }}
-        >
-          ← Back to All Recipes
-        </Link>
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <h2 className="text-2xl font-bold text-gray-800">{recipe.name}</h2>
+      <p className="text-gray-600 mt-2">{recipe.description}</p>
+
+      {/* Ingredients */}
+      <div className="mt-4">
+        <h3 className="font-semibold">Ingredients:</h3>
+        <ul className="list-disc list-inside text-gray-700">
+          {recipe.ingredients?.map((ingredient, index) => (
+            <li key={index}>{ingredient}</li>
+          ))}
+        </ul>
       </div>
 
-      {/* Recipe Details Card */}
-      <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
-        {/* Recipe Header */}
-        <div style={{
-          padding: '30px',
-          borderBottom: '1px solid #eee'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '20px',
-            marginBottom: '15px'
-          }}>
-            <h1 style={{
-              fontSize: '32px',
-              color: '#333',
-              margin: '0',
-              lineHeight: '1.2',
-              flex: 1
-            }}>
-              {recipe.title}
-            </h1>
-            
-            <FavoriteButton 
-              recipeId={recipe.id} 
-              recipeName={recipe.title}
-              size="large"
-              showText={true}
-            />
-          </div>
-          
-          {recipe.createdAt && (
-            <p style={{
-              color: '#666',
-              fontSize: '14px',
-              margin: '0',
-              fontStyle: 'italic'
-            }}>
-              Created on {new Date(recipe.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
-          )}
-        </div>
-
-        {/* Recipe Description */}
-        <div style={{ padding: '30px' }}>
-          <h3 style={{
-            fontSize: '20px',
-            color: '#333',
-            margin: '0 0 15px 0'
-          }}>
-            Description
-          </h3>
-          <div style={{
-            backgroundColor: '#f8f9fa',
-            padding: '20px',
-            borderRadius: '4px',
-            borderLeft: '4px solid #2196F3'
-          }}>
-            <p style={{
-              fontSize: '16px',
-              lineHeight: '1.6',
-              color: '#555',
-              margin: '0',
-              whiteSpace: 'pre-wrap'
-            }}>
-              {recipe.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div style={{
-          padding: '30px',
-          borderTop: '1px solid #eee',
-          backgroundColor: '#f8f9fa',
-          display: 'flex',
-          gap: '15px',
-          justifyContent: 'flex-end',
-          flexWrap: 'wrap'
-        }}>
-          <FavoriteButton 
-            recipeId={recipe.id} 
-            recipeName={recipe.title}
-            size="medium"
-            showText={true}
-          />
-          
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: isEditing ? '#ff9800' : '#2196F3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = isEditing ? '#f57c00' : '#1976D2';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = isEditing ? '#ff9800' : '#2196F3';
-            }}
-          >
-            {isEditing ? 'Cancel Edit' : 'Edit Recipe'}
-          </button>
-          
-          <DeleteRecipeButton id={recipe.id} />
-        </div>
+      {/* Instructions */}
+      <div className="mt-4">
+        <h3 className="font-semibold">Instructions:</h3>
+        <p className="text-gray-700">{recipe.instructions}</p>
       </div>
 
-      {/* Edit Form */}
-      {isEditing && (
-        <div style={{ marginTop: '30px' }}>
-          <EditRecipeForm 
-            recipe={recipe} 
-            onSave={() => setIsEditing(false)}
-            onCancel={() => setIsEditing(false)}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default RecipeDetails;
-
-const RecipeDetails = () => {
-  const { id } = useParams();
-  const recipe = useRecipeStore((state) =>
-    state.recipes.find((r) => r.id === parseInt(id))
-  );
-  const [isEditing, setIsEditing] = useState(false);
-
-  if (!recipe) {
-    return (
-      <div style={{
-        textAlign: 'center',
-        padding: '40px',
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-      }}>
-        <h2 style={{ color: '#f44336', marginBottom: '20px' }}>Recipe Not Found</h2>
-        <p style={{ marginBottom: '30px', color: '#666' }}>
-          The recipe you're looking for doesn't exist or may have been deleted.
-        </p>
-        <Link 
-          to="/"
-          style={{
-            display: 'inline-block',
-            padding: '12px 24px',
-            backgroundColor: '#2196F3',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: '4px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#1976D2';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = '#2196F3';
-          }}
-        >
-          Back to Recipes
-        </Link>
+      {/* Cooking time + Favorite button */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-sm text-gray-500">
+          ⏱ {recipe.cookingTime || "N/A"} mins
+        </span>
+        <FavoriteButton recipeId={recipe.id} />
       </div>
-    );
-  }
-
-  return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      {/* Navigation */}
-      <div style={{ marginBottom: '20px' }}>
-        <Link 
-          to="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            color: '#2196F3',
-            textDecoration: 'none',
-            fontSize: '16px',
-            fontWeight: 'bold'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.textDecoration = 'underline';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.textDecoration = 'none';
-          }}
-        >
-          ← Back to All Recipes
-        </Link>
-      </div>
-
-      {/* Recipe Details Card */}
-      <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '8px',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
-        {/* Recipe Header */}
-        <div style={{
-          padding: '30px',
-          borderBottom: '1px solid #eee'
-        }}>
-          <h1 style={{
-            fontSize: '32px',
-            color: '#333',
-            margin: '0 0 15px 0',
-            lineHeight: '1.2'
-          }}>
-            {recipe.title}
-          </h1>
-          
-          {recipe.createdAt && (
-            <p style={{
-              color: '#666',
-              fontSize: '14px',
-              margin: '0',
-              fontStyle: 'italic'
-            }}>
-              Created on {new Date(recipe.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </p>
-          )}
-        </div>
-
-        {/* Recipe Description */}
-        <div style={{ padding: '30px' }}>
-          <h3 style={{
-            fontSize: '20px',
-            color: '#333',
-            margin: '0 0 15px 0'
-          }}>
-            Description
-          </h3>
-          <div style={{
-            backgroundColor: '#f8f9fa',
-            padding: '20px',
-            borderRadius: '4px',
-            borderLeft: '4px solid #2196F3'
-          }}>
-            <p style={{
-              fontSize: '16px',
-              lineHeight: '1.6',
-              color: '#555',
-              margin: '0',
-              whiteSpace: 'pre-wrap'
-            }}>
-              {recipe.description}
-            </p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div style={{
-          padding: '30px',
-          borderTop: '1px solid #eee',
-          backgroundColor: '#f8f9fa',
-          display: 'flex',
-          gap: '15px',
-          justifyContent: 'flex-end'
-        }}>
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: isEditing ? '#ff9800' : '#2196F3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = isEditing ? '#f57c00' : '#1976D2';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = isEditing ? '#ff9800' : '#2196F3';
-            }}
-          >
-            {isEditing ? 'Cancel Edit' : 'Edit Recipe'}
-          </button>
-          
-          <DeleteRecipeButton id={recipe.id} />
-        </div>
-      </div>
-
-      {/* Edit Form */}
-      {isEditing && (
-        <div style={{ marginTop: '30px' }}>
-          <EditRecipeForm 
-            recipe={recipe} 
-            onSave={() => setIsEditing(false)}
-            onCancel={() => setIsEditing(false)}
-          />
-        </div>
-      )}
     </div>
   );
 };
